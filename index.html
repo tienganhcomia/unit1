@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ms. Mia's English Class - Unit 1</title>
+    <style>
+        :root {
+            --bg-color: #fdf5e6;
+            --accent-color: #ff9a9e;
+            --text-color: #4a4a4a;
+            --highlight-color: #fff176;
+            --button-bg: #ffffff;
+            --active-button: #8ed1fc;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(#ffe4b5 10%, transparent 10%),
+                linear-gradient(135deg, #fdf5e6 0%, #ffecd2 100%);
+            background-size: 30px 30px, 100% 100%;
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar Navigation */
+        #sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border-right: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        #logo-container {
+            position: sticky;
+            top: 0;
+            padding: 20px 10px;
+            text-align: center;
+            background: transparent;
+        }
+
+        #logo-container img {
+            max-width: 160px;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #d4a373;
+            text-align: center;
+            margin: 5px 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #button-list-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 15px 20px 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .story-btn {
+            width: 100%;
+            background: var(--button-bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .story-btn.active {
+            background: var(--active-button);
+            color: white;
+            border-color: #0693e3;
+        }
+
+        /* Main Reading Area */
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .instruction {
+            text-align: center;
+            font-weight: bold;
+            color: #b5835a;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        #reading-box {
+            background: rgba(255, 255, 255, 0.92);
+            flex: 1;
+            border-radius: 35px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            line-height: 1.7;
+            font-size: 2.1rem;
+            overflow-y: auto;
+            border: 6px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .word {
+            display: inline-block;
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 8px;
+            transition: background 0.1s;
+            /* Prevents blue highlight box on mobile double-tap */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .word.playing {
+            background: var(--highlight-color) !important;
+            transform: scale(1.1);
+        }
+
+        /* Mobile Layout Adjustments */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            #sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 35vh;
+                border-right: none;
+                border-bottom: 2px solid white;
+            }
+            #logo-container { padding: 10px; }
+            #logo-container img { max-width: 100px; }
+            h2 { font-size: 1rem; margin: 0 0 5px 0; }
+            #button-list-wrapper {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 10px;
+                gap: 10px;
+            }
+            .story-btn {
+                width: auto;
+                white-space: nowrap;
+                margin-bottom: 0;
+                padding: 8px 12px;
+            }
+            #main-content { padding: 15px; }
+            #reading-box { font-size: 1.5rem; padding: 20px; border-radius: 20px; }
+            .instruction { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="sidebar">
+        <div id="logo-container">
+            <img src="logo.png" alt="Ms. Mia Logo">
+        </div>
+        <h2>Unit 1</h2>
+        <div id="button-list-wrapper">
+            <div id="button-list"></div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <div class="instruction">💻 Click a word | 📱 Double-tap a word</div>
+        <div id="reading-box"></div>
+    </main>
+
+    <script>
+        const stories = [
+            { title: "1. Good Morning Song", text: "Good morning to you.\nGood morning to you.\nI’m happy to see you.\nI’m glad to be with you.\nWe’ll work and we’ll play.\nWe’ll have a good day!" },
+            { title: "2. Ten Little Monkeys", text: "One little, two little, three little monkeys,\nFour little, five little, six little monkeys,\nSeven little, eight little, nine little monkeys,\nTen little monkeys playing in a tree!\nOne little, two little, three little monkeys,\nFour little, five little, six little monkeys,\nSeven little, eight little, nine little monkeys,\nTen little monkeys playing in a tree!" },
+            { title: "3. Five Little Animals", text: "Five little elephants dancing on the floor,\nOne walks away, and then there are four.\nElephant, are you happy today?\nElephant, elephant, walk away.\n\nFive little kangaroos jumping on the floor,\nOne hops away, and then there are four.\nKangaroo, are you happy today?\nKangaroo, kangaroo, hop away.\n\nFive little monkeys playing on the floor,\nOne climbs away, and then there are four.\nMonkey, are you happy today?\nMonkey, monkey, climb away." },
+            { title: "4. Hello, My Friend!", text: "Hello, my friend. What is your name?\nWhat is your name?\nI am Pete.\nI have a friend. His name is Arty.\nHis name is Arty.\nI like him.\nI have a friend. Her name is Tonya.\nHer name is Tonya.\nI like her." },
+            { title: "5. Where Are You?", text: "Where is Arty? Where is Arty?\nHere I am! Here I am!\nHow are you this morning?\nI am fine, thank you.\nNow sit down. Now sit down.\n\nWhere is DeeDee? Where is DeeDee?\nHere I am! Here I am!\nHow are you this morning?\nI am fine, thank you.\nRun away! Run away!" },
+            { title: "6. I Love Them All", text: "This is my father.\nThis is my mother.\nThis is my brother tall.\nThis is my sister.\nThis is the baby.\nOh, how I love them all!" },
+            { title: "7. Alphabet Song", text: "A B C D E F G\nH I J K L M N\nO P Q R S T U\nV W X Y Z.\nNow we know our ABCs.\nCan we sing them once more, please?\n\na b c d e f g\nh i j k l m n\no p q r s t u\nv w x y z.\nNow we know our ABCs.\nCan we sing them once more, please?" },
+            { title: "8. Goodbye Song", text: "Goodbye, goodbye!\nI’ve had a very good day.\nGoodbye, goodbye!\nBe careful on your way." },
+            { title: "9. Stand Up!", text: "Stand up. Sit down.\nStand up. Sit down.\nStand up. Sit down.\nAnd clap your hands!\n\nLook up. Look down.\nLook up. Look down.\nLook up. Look down.\nAnd clap your hands!\n\nStand up. Sit down.\nStand up. Look down.\nLook up. Sit down.\nAnd clap your hands!\n\nGo to sleep. Wake up.\nGo to sleep. Wake up.\nGo to sleep. Wake up.\nAnd clap your hands!\n\nStand up. Turn around.\nTurn around. Turn around.\nTurn around. Sit down.\nAnd clap your hands!\n\nStand up. Look down.\nLook up. Look up high.\nLook around. Sit down.\nAnd clap your hands!" },
+            { title: "10. Hop Like a Rabbit", text: "Hop, hop, hop like a rabbit.\nHop like a rabbit with a friend.\nClimb, climb, climb like a monkey.\nClimb like a monkey up a tree.\nFly, fly, fly like a bird.\nFly like a bird in the sky.\nJump, jump, jump like a kangaroo.\nJump like a kangaroo at the zoo.\nCrawl, crawl, crawl like an alligator.\nCrawl like an alligator to the rock.\nRun, run, run like a zebra.\nRun like a zebra at the zoo.\nWalk, walk, walk like an elephant.\nWalk like an elephant.\nAnd stop!" },
+            { title: "11. I Say; You Do", text: "Stand up.\nSit down.\nGo to sleep.\nWake up.\nSay, “Good morning!”\nLook up.\nLook at your teacher.\nStand up.\nCome here — stop!\nNow walk to the line.\nTake one step.\nTake one step back.\nLook at me.\nStep on the line — stop!\nStep on the line.\nTake one step back.\nLook at me.\nStep over the line — stop!\nStep over the line.\nTake two steps back.\nNow go to your chair — stop!\nWalk slowly.\nWalk fast.\nStand at your chair.\nWalk around your chair.\nStop!\nLook at me.\nSit down." },
+            { title: "12. Zoo", text: "I like the animals\nAt the zoo.\nI like the zebra\nAnd the kangaroo." },
+            { title: "13. Friends", text: "We are friends.\nWe play and run.\nWe are friends,\nAnd we have fun!" },
+            { title: "14. Little Monkey", text: "Little monkey\nHigh up in the tree,\nPlease come down\nAnd play with me." },
+            { title: "15. Red", text: "Do you like red?\nYes, I do!\nI like red hats and red shoes.\nDo you like red?\nYes, I do!\nI like red balls and balloons.\nDo you like red?\nYes, I do!\nI like red birds at the zoo.\nDo you like red?\nYes, I do!\nI like red, and I like you!" },
+            { title: "16. One Family", text: "I have one nose, one mouth, and one head.\nI sleep in one house, in one room, and one bed.\nOne father, one mother — we have one baby,\nOne sister, one brother, and me.\nI love them all,\nAnd they love me.\nWe are one family." },
+            { title: "17. Family and Friends", text: "This is my family.\nThis is my father.\nThis is my mother.\nMy father is big.\nMy mother is small.\nThese are my sisters.\nThis is my baby.\nThis is my brother.\nAnd this is me!\n\nThis is my friend. His name is Arty.\nArty has a toy — a big red ball.\nThese are my friends.\nWe play and we run.\nThese are my friends.\nWe jump and we swing.\nI love my family.\nI love my friends!" },
+            { title: "18. Animals Play", text: "The bird flies in the sky.\nThe bird sits in the tree.\nThe monkey climbs in the tree.\nThe monkey plays with a ball.\nThe rabbit hops to the rock.\nThe rabbit plays with a friend.\nThe kangaroo jumps over a rock.\nThe kangaroo sits on a rock.\nThe hippopotamus sleeps under the tree.\nThe hippopotamus steps over the turtle.\nThe turtle sleeps on a rock.\nThe turtle crawls under the rock.\nThe alligator crawls on a rock.\nThe alligator sits with the snake.\nThe giraffe runs in the grass.\nThe giraffe steps over the tree.\nI like animals!" },
+            { title: "19. Family at the Zoo", text: "I like to go to the zoo.\nMy family likes to go to the zoo.\nWe see the animals play.\nWe see the birds sing.\nI see a bear sleeping on the grass.\nMy family sees a bear playing with a ball.\nMy father sees a gorilla sitting on a rock.\nMy mother sees a baby gorilla.\nMy sister sees a panda under a tree.\nThe girls like the pandas.\nMy brother sees a tiger in the grass.\nThe boys like tigers.\nI see a father lion.\nI see a mother lion.\nDo you see the baby lion?\nSee the family of hippos!\nThe hippos walk in a circle.\nMy family has fun at the zoo.\nThe animals have fun at the zoo.\nWe say “Goodbye” to the zoo!" },
+            { title: "20. What Do You See?", text: "I see a panda.\nThe panda sees a bear.\nThe bear is jumping over a rock.\nI see a bear.\nThe bear sees a gorilla.\nThe gorilla is swinging in a tree.\nI see a gorilla.\nThe gorilla sees a bird.\nThe bird is flying in the sky.\nI see a bird.\nThe bird sees a tiger.\nThe tiger is running in the grass.\nI see a tiger.\nThe tiger sees a snake.\nThe snake is sliding down a tree.\nI see a snake.\nThe snake sees a girl.\nThe girl is sitting on a rock.\nLittle girl, little girl,\nWhat do you see?\nI see a little girl\nLooking back at me!" },
+            { title: "21. Mice in the Barn", text: "In the box.\nOut of the box.\nThrough the hole.\nDown the tree.\nAround the rock.\nThrough the trees.\nAround the snake.\nThrough the grass.\nUp the steps.\nTo the door.\nAt the door.\nUnder the door.\nOver the toys.\nUp the chair.\nOn the table.\n\nMeeeeeooow!\n\nOff the table.\nOff the chair.\nOn the floor.\nOver the toys.\nUnder the door.\nDown the steps.\nThrough the grass.\nAround the snake.\nThrough the trees.\nAround the rock.\nUp the tree.\nThrough the hole.\nIn the box!\nThe End." },
+            { title: "22. Johnny Bear: This Is Me!", text: "Hello! I am Johnny Bear!\nThis is my family.\nThis is my father.\nMy father is big.\nThis is my mother.\nThis is my big brother.\nThis is my little sister, Jenny.\nThis is the baby, Teddy Bear.\nThis is my big sister.\nThis is my grandfather,\nAnd this is my grandmother.\nThey like to play with me.\nAnd this is me!\nI love my family!" }
+        ];
+
+        const buttonList = document.getElementById('button-list');
+        const readingBox = document.getElementById('reading-box');
+        const synth = window.speechSynthesis;
+        let preferredVoice = null;
+
+        function setPreferredVoice() {
+            const voices = synth.getVoices();
+            preferredVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Samantha'))) || 
+                             voices.find(v => v.lang === 'en-US') || 
+                             voices[0];
+        }
+
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = setPreferredVoice;
+        }
+
+        function init() {
+            stories.forEach((story, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'story-btn';
+                btn.innerText = story.title;
+                btn.onclick = () => loadStory(index);
+                buttonList.appendChild(btn);
+            });
+            loadStory(0);
+            setPreferredVoice();
+        }
+
+        function loadStory(index) {
+            const buttons = document.querySelectorAll('.story-btn');
+            buttons.forEach((btn, i) => btn.classList.toggle('active', i === index));
+
+            readingBox.innerHTML = '';
+            const lines = stories[index].text.split('\n');
+
+            lines.forEach(line => {
+                if (line.trim() === "") {
+                    readingBox.appendChild(document.createElement('br'));
+                    return;
+                }
+                const lineDiv = document.createElement('div');
+                const parts = line.split(/(\s+)/); 
+
+                parts.forEach(part => {
+                    if (part.trim() === "") {
+                        lineDiv.appendChild(document.createTextNode(part));
+                    } else {
+                        const span = document.createElement('span');
+                        span.className = 'word';
+                        span.innerText = part;
+
+                        // Logic to handle PC vs Mobile
+                        let lastTap = 0;
+                        span.addEventListener('touchend', function(e) {
+                            const currentTime = new Date().getTime();
+                            const tapLength = currentTime - lastTap;
+                            if (tapLength < 300 && tapLength > 0) {
+                                // Double tap detected
+                                speak(part, span);
+                                e.preventDefault();
+                            }
+                            lastTap = currentTime;
+                        });
+
+                        span.addEventListener('click', function(e) {
+                            // Only trigger on click if it's NOT a touch device
+                            if (e.pointerType !== 'touch') {
+                                speak(part, span);
+                            }
+                        });
+
+                        lineDiv.appendChild(span);
+                    }
+                });
+                readingBox.appendChild(lineDiv);
+            });
+            readingBox.scrollTop = 0;
+        }
+
+        function speak(word, element) {
+            document.querySelectorAll('.word.playing').forEach(el => el.classList.remove('playing'));
+            synth.cancel();
+
+            const cleanWord = word.replace(/[.,!?;:“”]/g, "");
+            const utterance = new SpeechSynthesisUtterance(cleanWord);
+            
+            utterance.rate = 0.65; 
+            utterance.pitch = 1.1;
+            
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            } else {
+                utterance.lang = 'en-US';
+            }
+
+            utterance.onstart = () => element.classList.add('playing');
+            utterance.onend = () => element.classList.remove('playing');
+            
+            synth.speak(utterance);
+        }
+
+        init();
+    </script>
+</body>
+</html>
